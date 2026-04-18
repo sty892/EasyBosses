@@ -22,17 +22,26 @@ public class BossResourceLoader {
     public static void loadFromServer(final String rawIp, final int port) {
         CompletableFuture.runAsync(() -> {
             try {
-                String ip = rawIp;
-                if (ip == null || ip.isEmpty() || ip.equals("local")) {
-                    ip = "127.0.0.1";
+                String host = rawIp;
+                if (host == null || host.isEmpty() || host.equals("local")) {
+                    host = "127.0.0.1";
+                } else {
+                    int lastColon = host.lastIndexOf(':');
+                    if (lastColon != -1) {
+                        String potentialPort = host.substring(lastColon + 1);
+                        if (potentialPort.matches("\\d+")) {
+                            host = host.substring(0, lastColon);
+                        }
+                    }
                 }
-                // Use only host without port
-                final String host = ip.split(":")[0];
 
                 URL listUrl = new URI("http://" + host + ":" + port + "/api/bosses").toURL();
                 List<String> bossIds;
                 try (InputStreamReader reader = new InputStreamReader(listUrl.openStream())) {
                     bossIds = GSON.fromJson(reader, new TypeToken<List<String>>(){}.getType());
+                } catch (Exception e) {
+                    System.err.println("Failed to fetch boss list from " + host + ":" + port + ". Skipping resource loading.");
+                    return;
                 }
 
                 if (bossIds == null) return;
@@ -54,8 +63,10 @@ public class BossResourceLoader {
                             Files.createDirectories(dest.getParent());
                             Files.copy(zis, dest, StandardCopyOption.REPLACE_EXISTING);
                         }
+                        System.out.println("Boss resources loaded for " + bossId);
+                    } catch (Exception e) {
+                        System.err.println("Failed to download resources for boss " + bossId + ": " + e.getMessage());
                     }
-                    System.out.println("Boss resources loaded for " + bossId);
                 }
 
                 MinecraftClient.getInstance().execute(() -> {
@@ -63,7 +74,7 @@ public class BossResourceLoader {
                 });
 
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println("Unexpected error during resource loading: " + e.getMessage());
             }
         });
     }
