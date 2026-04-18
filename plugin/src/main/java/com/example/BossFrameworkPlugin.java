@@ -62,9 +62,17 @@ public class BossFrameworkPlugin extends JavaPlugin implements Listener {
     }
 
     public void reloadPlugin() {
+        reloadConfig();
         if (manager != null) manager.stop();
         if (resourceServer != null) resourceServer.stop();
         
+        String bossesFolder = getConfig().getString("bosses-folder", "bosses");
+        long tickInterval = getConfig().getLong("performance.tick-interval", 2L);
+        long hitboxInterval = getConfig().getLong("performance.hitbox-update-interval", 2L);
+        
+        getLogger().info(String.format("Loading config: bosses-folder=%s, tick-interval=%d, hitbox-update-interval=%d", 
+                bossesFolder, tickInterval, hitboxInterval));
+
         registry.loadAll();
         
         if (getConfig().getBoolean("resource-server.enabled", true)) {
