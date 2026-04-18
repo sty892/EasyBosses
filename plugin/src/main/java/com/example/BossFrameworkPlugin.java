@@ -73,7 +73,22 @@ public class BossFrameworkPlugin extends JavaPlugin implements Listener {
         
         manager.start();
         
-        // TODO: Restore bosses from loaded chunks
+        restoreBosses();
+    }
+
+    private void restoreBosses() {
+        Bukkit.getWorlds().forEach(world -> {
+            for (org.bukkit.Chunk chunk : world.getLoadedChunks()) {
+                for (org.bukkit.entity.Entity entity : chunk.getEntities()) {
+                    if (entity instanceof org.bukkit.entity.ArmorStand stand) {
+                        String bossId = stand.getPersistentDataContainer().get(bossIdKey, org.bukkit.persistence.PersistentDataType.STRING);
+                        if (bossId != null) {
+                            manager.spawnBoss(stand, bossId);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     @EventHandler
