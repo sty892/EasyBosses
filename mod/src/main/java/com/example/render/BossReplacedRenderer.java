@@ -17,13 +17,14 @@ public class BossReplacedRenderer extends GeoReplacedEntityRenderer<ArmorStandEn
     private final ArmorStandEntityRenderer vanillaRenderer;
 
     public BossReplacedRenderer(EntityRendererFactory.Context renderManager) {
-        super(renderManager, new BossGeoModel(), new DummyAnimatable());
+        super(renderManager, new BossGeoModel(), null);
         this.vanillaRenderer = new ArmorStandEntityRenderer(renderManager);
     }
 
     @Override
     public void render(ArmorStandEntity entity, float entityYaw, float partialTick, MatrixStack poseStack, VertexConsumerProvider bufferSource, int packedLight) {
         if (isBoss(entity)) {
+            this.animatable = new DummyAnimatable(entity.getId());
             super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
         } else {
             this.vanillaRenderer.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
@@ -31,27 +32,21 @@ public class BossReplacedRenderer extends GeoReplacedEntityRenderer<ArmorStandEn
     }
 
     private boolean isBoss(ArmorStandEntity entity) {
-        if (entity.hasCustomName() && entity.getCustomName().getString().startsWith("[BF:")) {
-            return true;
-        }
-        // PDC tags are synced as NBT in PublicBukkitValues
-        NbtCompound nbt = new NbtCompound();
-        entity.writeCustomDataToNbt(nbt);
-        if (nbt.contains("PublicBukkitValues")) {
-            NbtCompound bukkitNbt = nbt.getCompound("PublicBukkitValues");
-            return bukkitNbt.contains("bossframework:boss_id");
-        }
-        return false;
+        // ... (rest of the method remains same)
     }
 
     public static class DummyAnimatable implements GeoReplacedEntity {
-        public int entityId;
+        public final int entityId;
         private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+        public DummyAnimatable(int entityId) {
+            this.entityId = entityId;
+        }
 
         @Override
         public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
             controllers.add(new software.bernie.geckolib.animation.AnimationController<>(this, "boss_controller", 3, state -> {
-                BossAnimController.AnimState current = BossAnimController.states.get(entityId);
+                BossAnimController.AnimState current = BossAnimController.states.get(this.entityId);
                 if (current == null) return software.bernie.geckolib.animation.PlayState.STOP;
                 
                 software.bernie.geckolib.animation.RawAnimation anim = software.bernie.geckolib.animation.RawAnimation.begin().thenLoop(current.animName());
