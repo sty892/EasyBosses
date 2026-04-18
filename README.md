@@ -3,8 +3,8 @@
 Фреймворк для создания кастомных боссов с использованием моделей Blockbench (GeckoLib) для Minecraft (Paper + Fabric).
 
 ## Требования
-- **Server:** Paper 1.21.1
-- **Client:** Fabric 1.21.1
+- **Server:** Paper 1.21.11
+- **Client:** Fabric 1.21.11
 - **Java:** 17+ (рекомендуется 21)
 
 ## Структура проекта
