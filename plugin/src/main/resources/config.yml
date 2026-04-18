@@ -1,0 +1,10 @@
+resource-server:
+  enabled: true
+  port: 25566
+  fallback-resource-pack: false
+
+bosses-folder: "bosses"
+
+performance:
+  tick-interval: 2
+  hitbox-update-interval: 2
