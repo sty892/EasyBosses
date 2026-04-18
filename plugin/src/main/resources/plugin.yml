@@ -2,3 +2,8 @@ name: BossFramework
 version: '${version}'
 main: com.example.BossFrameworkPlugin
 api-version: '1.21'
+commands:
+  boss:
+    description: Main command for BossFramework
+    usage: /boss <assign|reload|list|kill|debug>
+    permission: bossframework.admin
