@@ -26,12 +26,14 @@ public class ResourceServer {
     public void start(int port) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            for (BossDefinition def : registry.getAll().values()) {
-                md.update(def.id.getBytes(StandardCharsets.UTF_8));
-                if (def.geoJson != null) md.update(def.geoJson.getBytes(StandardCharsets.UTF_8));
-                if (def.animationsJson != null) md.update(def.animationsJson.getBytes(StandardCharsets.UTF_8));
-                if (def.texturePng != null) md.update(def.texturePng);
-            }
+            registry.getAll().values().stream()
+                    .sorted(java.util.Comparator.comparing(def -> def.id))
+                    .forEach(def -> {
+                        md.update(def.id.getBytes(StandardCharsets.UTF_8));
+                        if (def.geoJson != null) md.update(def.geoJson.getBytes(StandardCharsets.UTF_8));
+                        if (def.animationsJson != null) md.update(def.animationsJson.getBytes(StandardCharsets.UTF_8));
+                        if (def.texturePng != null) md.update(def.texturePng);
+                    });
             byte[] digest = md.digest();
             StringBuilder sb = new StringBuilder();
             for (byte b : digest) {
