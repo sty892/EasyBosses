@@ -44,20 +44,40 @@ public class FileSystemResourcePack implements ResourcePack {
                     if (!Files.isDirectory(ipDir)) continue;
                     Path path = ipDir.resolve("assets").resolve(id.getNamespace()).resolve(id.getPath());
                     if (Files.exists(path)) {
-                        return () -> Files.newInputStream(path);
+                        return InputSupplier.create(path);
                     }
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            // Ignore
         }
         return null;
     }
 
     @Override
     public void listResources(ResourceType type, String namespace, String prefix, ResourceConsumer consumer) {
-        // GeckoLib might need this to discover resources.
-        // For simplicity, we can skip it unless GeckoLib fails to find the model.
+        if (type != ResourceType.CLIENT_RESOURCES) return;
+        try {
+            if (!Files.exists(root)) return;
+            try (var streams = Files.list(root)) {
+                for (Path ipDir : streams.toList()) {
+                    if (!Files.isDirectory(ipDir)) continue;
+                    Path assets = ipDir.resolve("assets").resolve(namespace);
+                    if (!Files.exists(assets)) continue;
+                    
+                    Path searchRoot = assets.resolve(prefix);
+                    if (!Files.exists(searchRoot)) continue;
+
+                    Files.walk(searchRoot).filter(Files::isRegularFile).forEach(path -> {
+                        String relativePath = assets.relativize(path).toString().replace("\\", "/");
+                        Identifier id = Identifier.of(namespace, relativePath);
+                        consumer.accept(id, InputSupplier.create(path));
+                    });
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -67,6 +87,19 @@ public class FileSystemResourcePack implements ResourcePack {
 
     @Override
     public <T> @Nullable T parseMetadata(ResourceMetadataReader<T> metaReader) throws IOException {
+        Path packMeta = root.resolve("pack.mcmeta");
+        if (Files.exists(packMeta)) {
+            try (InputStream is = Files.newInputStream(packMeta)) {
+                return metaReader.fromJson(new com.google.gson.JsonParser().parse(new java.io.InputStreamReader(is)).getAsJsonObject().getAsJsonObject("pack"));
+            }
+        }
+        // Fallback for metadata if pack.mcmeta doesn't exist at root
+        if (metaReader.getKey().equals("pack")) {
+            com.google.gson.JsonObject obj = new com.google.gson.JsonObject();
+            obj.addProperty("description", "Boss Framework Resources");
+            obj.addProperty("pack_format", 15);
+            return metaReader.fromJson(obj);
+        }
         return null;
     }
 

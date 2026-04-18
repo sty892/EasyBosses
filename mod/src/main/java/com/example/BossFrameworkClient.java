@@ -23,22 +23,5 @@ public class BossFrameworkClient implements ClientModInitializer {
         EntityRendererRegistry.register(EntityType.ARMOR_STAND, BossReplacedRenderer::new);
 
         ClientPacketHandler.register();
-
-        registerCacheResourcePack();
-    }
-
-    private void registerCacheResourcePack() {
-        Path cacheDir = FabricLoader.getInstance().getGameDir().resolve("bossframework_cache");
-        Identifier packId = Identifier.of("bossframework", "cache");
-
-        // Registering as a builtin pack to satisfy the requirement via ResourceManagerHelper
-        ResourceManagerHelper.registerBuiltinResourcePack(packId,
-                FabricLoader.getInstance().getModContainer("bossframework").orElseThrow(),
-                Text.literal("Boss Framework Cache"),
-                ResourcePackActivationType.ALWAYS_ENABLED);
-
-        // Note: In a production environment, additional steps (like a Mixin to ResourcePackManager)
-        // would be needed to link the physical folder 'bossframework_cache' to the ResourceManager
-        // via our FileSystemResourcePack class.
     }
 }

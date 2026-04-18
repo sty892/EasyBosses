@@ -3,7 +3,8 @@
   "package": "com.example.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "CustomPayloadMixin"
+    "CustomPayloadMixin",
+    "ResourcePackManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
