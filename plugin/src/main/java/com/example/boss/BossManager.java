@@ -51,6 +51,16 @@ public class BossManager {
         interactionToInstance.clear();
     }
 
+    public void despawnTrackedBosses() {
+        for (BossInstance boss : activeInstances.values()) {
+            if (!boss.active || boss.cachedStand == null || !boss.cachedStand.isValid()) {
+                continue;
+            }
+
+            packetSender.sendDespawn(boss.cachedStand.getTrackedBy(), boss.armorStandEntityId);
+        }
+    }
+
     public BossInstance spawnBoss(ArmorStand stand, String bossId) {
         BossDefinition def = registry.getBoss(bossId);
         if (def == null) return null;

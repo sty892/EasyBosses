@@ -56,14 +56,20 @@ public class BossFrameworkPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        if (manager != null) manager.stop();
+        if (manager != null) {
+            manager.despawnTrackedBosses();
+            manager.stop();
+        }
         if (resourceServer != null) resourceServer.stop();
         PacketEvents.getAPI().terminate();
     }
 
     public void reloadPlugin() {
         reloadConfig();
-        if (manager != null) manager.stop();
+        if (manager != null) {
+            manager.despawnTrackedBosses();
+            manager.stop();
+        }
         if (resourceServer != null) resourceServer.stop();
         
         String bossesFolder = getConfig().getString("bosses-folder", "bosses");
