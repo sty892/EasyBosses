@@ -21,7 +21,13 @@ public class BossReplacedRenderer extends GeoReplacedEntityRenderer<ArmorStandEn
 
         @Override
         public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-            // Register controllers in the renderer or here
+            controllers.add(new software.bernie.geckolib.animation.AnimationController<>(this, "boss_controller", 3, state -> {
+                BossAnimController.AnimState current = BossAnimController.states.get(entityId);
+                if (current == null) return software.bernie.geckolib.animation.PlayState.STOP;
+                
+                software.bernie.geckolib.animation.RawAnimation anim = software.bernie.geckolib.animation.RawAnimation.begin().thenLoop(current.animName());
+                return state.setAndContinue(anim);
+            }));
         }
 
         @Override
