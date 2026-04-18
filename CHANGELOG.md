@@ -1,43 +1,9 @@
 # Changelog
 
-## [0.5.2] - 2026-04-18
+## [0.5.3] - 2026-04-18
 ### Fixed
-- Исправлен синтаксис `plugin/build.gradle`: параметр `version` вынесен из блока зависимостей.
-- Реализован метод `isBoss()` в `BossReplacedRenderer.java` с проверкой PDC тега `bossframework:boss_id` и префикса имени `[BF:`.
-- Синхронизированы версии Minecraft до 1.21.1 во всех файлах конфигурации и документации.
-- Исправлен ключ кэша ресурсов: теперь используется формат `host_port` для предотвращения конфликтов.
-- Детерминированное вычисление хэша ресурсов: ID боссов теперь сортируются перед хэшированием.
-- Удален неиспользуемый `ResourcePackManagerMixin`.
-
-## [0.5.1] - 2026-04-18
-### Fixed
-- Исправлено несоответствие имен анимаций между сервером и `.bbmodel`. Теперь используются оригинальные имена из файла.
-- Добавлена синхронизация существующих боссов для новых игроков при входе на сервер.
-- Внедрен жизненный цикл флага `active` для боссов, предотвращающий обработку удаленных сущностей.
-- Безопасный запуск HTTP-сервера Javalin с обработкой конфликтов портов.
-
-## [0.5.0] - 2026-04-18
-### Added
-- Оптимизация `DamageListener`: теперь используется `interactionToInstance` Map для мгновенного поиска босса (O(1)).
-- Восстановление боссов при загрузке чанка (`ChunkLoadEvent`).
-
-### Fixed
-- Исправлена критическая ошибка в `BossReplacedRenderer.java` (удален плейсхолдер).
-- Безопасный парсинг адреса сервера в `BossResourceLoader` с обработкой ошибок.
-- Устранена дублирующая регистрация ресурс-паков (используется только `ResourceManagerHelper`).
-- Java 21 теперь является обязательным базовым уровнем.
-
-## [0.4.0] - 2026-04-18
-### Fixed
-- Исправлен конвейер рендеринга: `entityId` теперь гарантированно передается в конструктор `DummyAnimatable`.
-- Исправлена привязка конфигурации: добавлено логирование параметров при запуске.
-- Исправлена регистрация ресурс-паков в моде (удален хрупкий миксин, используется Fabric API).
-
-### Changed
-- Обновление до Minecraft 1.21.1.
-
-## [0.3.5] - 2026-04-18
-### Added
-- Команды `/boss list`, `/boss kill`, `/boss debug`.
-- Начальное версионирование проекта.
-- Файл README.md с описанием и инструкциями.
+- Implemented boss detection in `BossReplacedRenderer` using Armor Stand custom names with the `[BF:` prefix and the `bossframework:boss_id` persistent tag.
+- Updated the Fabric 1.21.1 mod-side GeckoLib and resource pack integration so `mod/gradlew build` succeeds again.
+- Aligned the documented and declared Paper/Fabric/Minecraft versions to 1.21.1.
+- Removed dead client mixins by deleting `ResourcePackManagerMixin` and the empty `CustomPayloadMixin`, and clearing the mixin list.
+- Sent `bossframework:despawn` to players tracking active bosses before plugin reload or disable to prevent ghost bosses on the client.

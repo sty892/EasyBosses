@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "bossframework",
-  "version": "${version}",
+  "version": "0.5.3",
   "name": "BossFramework",
   "description": "BossFramework client mod.",
   "authors": [],
