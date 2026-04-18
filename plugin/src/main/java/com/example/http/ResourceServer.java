@@ -53,6 +53,10 @@ public class ResourceServer {
             ctx.json(Map.of("hash", currentHash));
         });
 
+        app.get("/api/bosses", ctx -> {
+            ctx.json(registry.getAll().keySet());
+        });
+
         app.get("/boss/{id}/pack", ctx -> {
             String id = ctx.pathParam("id");
             BossDefinition def = registry.getBoss(id);
@@ -81,22 +85,27 @@ public class ResourceServer {
             ZipOutputStream zip = new ZipOutputStream(baos);
 
             if (definition.geoJson != null) {
-                zip.putNextEntry(new ZipEntry("geo/" + definition.id + ".geo.json"));
+                zip.putNextEntry(new ZipEntry("assets/bossframework/geo/" + definition.id + ".geo.json"));
                 zip.write(definition.geoJson.getBytes(StandardCharsets.UTF_8));
                 zip.closeEntry();
             }
 
             if (definition.animationsJson != null) {
-                zip.putNextEntry(new ZipEntry("animations/" + definition.id + ".animations.json"));
+                zip.putNextEntry(new ZipEntry("assets/bossframework/animations/" + definition.id + ".animations.json"));
                 zip.write(definition.animationsJson.getBytes(StandardCharsets.UTF_8));
                 zip.closeEntry();
             }
 
             if (definition.texturePng != null && definition.texturePng.length > 0) {
-                zip.putNextEntry(new ZipEntry("textures/entity/" + definition.id + ".png"));
+                zip.putNextEntry(new ZipEntry("assets/bossframework/textures/entity/" + definition.id + ".png"));
                 zip.write(definition.texturePng);
                 zip.closeEntry();
             }
+
+            zip.putNextEntry(new ZipEntry("pack.mcmeta"));
+            String mcmeta = "{\"pack\":{\"description\":\"Boss Resources\",\"pack_format\":15}}";
+            zip.write(mcmeta.getBytes(StandardCharsets.UTF_8));
+            zip.closeEntry();
 
             zip.close();
             return baos.toByteArray();
