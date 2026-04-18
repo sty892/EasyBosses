@@ -56,11 +56,11 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 tasks.named('jar') {
-    archiveClassifier = 'plain'
+    enabled = false
 }
 
 shadowJar {
-    archiveClassifier = 'all'
+    archiveClassifier = ''
     configurations = [project.configurations.runtimeClasspath]
     mergeServiceFiles()
 
@@ -74,10 +74,6 @@ tasks.named('assemble') {
 }
 
 build.dependsOn shadowJar
-
-artifacts {
-    archives tasks.named('shadowJar')
-}
 
 processResources {
     def props = [version: version]
