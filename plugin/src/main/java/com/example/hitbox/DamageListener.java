@@ -23,14 +23,8 @@ public class DamageListener implements Listener {
         Interaction interaction = (Interaction) event.getEntity();
         Player player = (Player) event.getDamager();
 
-        // Find BossInstance by interaction UUID
-        BossInstance boss = null;
-        for (BossInstance inst : bossManager.activeInstances.values()) {
-            if (inst.hitboxEntityUUID.equals(interaction.getUniqueId())) {
-                boss = inst;
-                break;
-            }
-        }
+        // Find BossInstance by interaction UUID using O(1) lookup
+        BossInstance boss = bossManager.interactionToInstance.get(interaction.getUniqueId());
 
         if (boss != null) {
             event.setCancelled(true);

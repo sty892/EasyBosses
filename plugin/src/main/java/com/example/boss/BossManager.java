@@ -24,6 +24,7 @@ public class BossManager {
     private BukkitTask tickTask;
 
     public final Map<UUID, BossInstance> activeInstances = new HashMap<>();
+    public final Map<UUID, BossInstance> interactionToInstance = new HashMap<>();
     private final NamespacedKey bossIdKey;
 
     public BossManager(BossFrameworkPlugin plugin, BossRegistry registry, PluginPacketSender packetSender) {
@@ -47,6 +48,7 @@ public class BossManager {
             }
         }
         activeInstances.clear();
+        interactionToInstance.clear();
     }
 
     public BossInstance spawnBoss(ArmorStand stand, String bossId) {
@@ -66,6 +68,7 @@ public class BossManager {
 
         BossInstance inst = new BossInstance(def, stand, interaction);
         activeInstances.put(stand.getUniqueId(), inst);
+        interactionToInstance.put(interaction.getUniqueId(), inst);
 
         // Send spawn packet
         Collection<Player> nearby = getNearbyPlayers(stand.getLocation(), 64);
@@ -85,7 +88,10 @@ public class BossManager {
             BossInstance boss = iterator.next();
 
             if (boss.cachedStand == null || !boss.cachedStand.isValid()) {
-                if (boss.cachedInteraction != null) boss.cachedInteraction.remove();
+                if (boss.cachedInteraction != null) {
+                    interactionToInstance.remove(boss.cachedInteraction.getUniqueId());
+                    boss.cachedInteraction.remove();
+                }
                 Collection<Player> nearby = getNearbyPlayers(boss.cachedStand != null ? boss.cachedStand.getLocation() : null, 64);
                 packetSender.sendDespawn(nearby, boss.armorStandEntityId);
                 iterator.remove();
@@ -120,11 +126,15 @@ public class BossManager {
 
     public void removeBoss(BossInstance boss) {
         activeInstances.remove(boss.armorStandUUID);
+        if (boss.cachedInteraction != null) {
+            interactionToInstance.remove(boss.cachedInteraction.getUniqueId());
+            boss.cachedInteraction.remove();
+        }
+        
         Collection<Player> nearby = getNearbyPlayers(boss.cachedStand.getLocation(), 64);
         packetSender.sendDespawn(nearby, boss.armorStandEntityId);
         
         if (boss.cachedStand != null) boss.cachedStand.remove();
-        if (boss.cachedInteraction != null) boss.cachedInteraction.remove();
     }
 
     public Collection<Player> getNearbyPlayers(Location loc, double radius) {
