@@ -56,6 +56,7 @@ public class BossRegistry {
 
                 registry.put(bossId, definition);
                 plugin.getLogger().info("Loaded boss: " + bossId);
+                plugin.getLogger().info("Animations for " + bossId + ": " + String.join(", ", definition.hitboxTracks.keySet()));
             } catch (Exception e) {
                 plugin.getLogger().severe("Failed to load boss " + bossId);
                 e.printStackTrace();

@@ -45,9 +45,16 @@ public class ResourceServer {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(BossFrameworkPlugin.class.getClassLoader());
 
-        app = Javalin.create().start(port);
-
-        Thread.currentThread().setContextClassLoader(classLoader);
+        try {
+            app = Javalin.create().start(port);
+            plugin.getLogger().info("Resource server started on port " + port);
+        } catch (Exception e) {
+            plugin.getLogger().severe("Failed to start resource server on port " + port + ": " + e.getMessage());
+            app = null;
+            return;
+        } finally {
+            Thread.currentThread().setContextClassLoader(classLoader);
+        }
 
         app.get("/version", ctx -> {
             ctx.json(Map.of("hash", currentHash));
@@ -69,8 +76,6 @@ public class ResourceServer {
             ctx.contentType("application/zip");
             ctx.result(zip);
         });
-        
-        plugin.getLogger().info("Resource server started on port " + port);
     }
 
     public void stop() {

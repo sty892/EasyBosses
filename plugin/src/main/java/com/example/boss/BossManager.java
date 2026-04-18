@@ -74,8 +74,12 @@ public class BossManager {
         Collection<Player> nearby = getNearbyPlayers(stand.getLocation(), 64);
         packetSender.sendSpawn(nearby, stand.getEntityId(), bossId);
         
-        // Initial animation
-        setAnimation(inst, "animation." + bossId + ".idle");
+        // Initial animation: search for something containing 'idle' or use first available
+        String idleAnim = def.hitboxTracks.keySet().stream()
+                .filter(name -> name.toLowerCase().contains("idle"))
+                .findFirst()
+                .orElse(def.hitboxTracks.keySet().stream().findFirst().orElse("unknown"));
+        setAnimation(inst, idleAnim);
 
         return inst;
     }
@@ -86,6 +90,10 @@ public class BossManager {
 
         for (var iterator = activeInstances.values().iterator(); iterator.hasNext();) {
             BossInstance boss = iterator.next();
+            if (!boss.active) {
+                iterator.remove();
+                continue;
+            }
 
             if (boss.cachedStand == null || !boss.cachedStand.isValid()) {
                 if (boss.cachedInteraction != null) {
@@ -125,6 +133,7 @@ public class BossManager {
     }
 
     public void removeBoss(BossInstance boss) {
+        boss.active = false;
         activeInstances.remove(boss.armorStandUUID);
         if (boss.cachedInteraction != null) {
             interactionToInstance.remove(boss.cachedInteraction.getUniqueId());
@@ -135,6 +144,18 @@ public class BossManager {
         packetSender.sendDespawn(nearby, boss.armorStandEntityId);
         
         if (boss.cachedStand != null) boss.cachedStand.remove();
+    }
+
+    public void syncToPlayer(Player player) {
+        for (BossInstance boss : activeInstances.values()) {
+            if (!boss.active) continue;
+            // Assuming 64 blocks visibility range
+            if (boss.cachedStand != null && boss.cachedStand.getLocation().getWorld().equals(player.getWorld()) &&
+                boss.cachedStand.getLocation().distanceSquared(player.getLocation()) < 64 * 64) {
+                packetSender.sendSpawn(java.util.Collections.singletonList(player), boss.armorStandEntityId, boss.definition.id);
+                packetSender.sendAnimState(java.util.Collections.singletonList(player), boss.armorStandEntityId, boss.currentAnimation, boss.animationTick);
+            }
+        }
     }
 
     public Collection<Player> getNearbyPlayers(Location loc, double radius) {
