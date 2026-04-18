@@ -1,6 +1,16 @@
+buildscript {
+    configurations.classpath {
+        resolutionStrategy.force(
+                'org.ow2.asm:asm:9.7',
+                'org.ow2.asm:asm-commons:9.7',
+                'org.ow2.asm:asm-tree:9.7'
+        )
+    }
+}
+
 plugins {
     id 'java'
-    id 'com.gradleup.shadow' version '9.2.0'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group = 'com.example'
@@ -28,7 +38,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    implementation("com.github.retrooper:packetevents-spigot:2.5.0")
+    implementation("com.github.retrooper:packetevents-spigot:2.6.0")
     implementation("io.javalin:javalin:6.3.0")
     implementation("com.google.code.gson:gson:2.10.1")
 }
@@ -49,12 +59,13 @@ tasks.named('jar') {
     archiveClassifier = 'plain'
 }
 
-tasks.named('shadowJar') {
-    archiveClassifier = ''
+shadowJar {
+    archiveClassifier = 'all'
     configurations = [project.configurations.runtimeClasspath]
     mergeServiceFiles()
 
-    relocate('io.github.retrooper.packetevents', 'com.example.shadow.packetevents')
+    relocate 'io.github.retrooper.packetevents', 'com.example.shadow.packetevents'
+    relocate 'com.github.retrooper.packetevents', 'com.example.shadow.packetevents2'
     relocate('io.javalin', 'com.example.shadow.javalin')
     relocate('org.eclipse.jetty', 'com.example.shadow.jetty')
     relocate('org.slf4j', 'com.example.shadow.slf4j')
@@ -63,6 +74,8 @@ tasks.named('shadowJar') {
 tasks.named('assemble') {
     dependsOn(tasks.named('shadowJar'))
 }
+
+build.dependsOn shadowJar
 
 artifacts {
     archives tasks.named('shadowJar')
