@@ -75,6 +75,31 @@ tasks.named('assemble') {
 
 build.dependsOn shadowJar
 
+tasks.register('verifyShadowJarContents') {
+    dependsOn shadowJar
+
+    doLast {
+        def jarFile = tasks.shadowJar.archiveFile.get().asFile
+        def requiredEntries = [
+                'io/github/retrooper/packetevents/factory/spigot/SpigotPacketEventsBuilder.class',
+                'com/github/retrooper/packetevents/wrapper/PacketWrapper.class',
+                'com/github/retrooper/packetevents/PacketEvents.class'
+        ]
+
+        def zip = new java.util.zip.ZipFile(jarFile)
+        try {
+            def missingEntries = requiredEntries.findAll { entry -> zip.getEntry(entry) == null }
+            if (!missingEntries.isEmpty()) {
+                throw new GradleException("Shadow jar is missing required PacketEvents classes: ${missingEntries}")
+            }
+        } finally {
+            zip.close()
+        }
+    }
+}
+
+build.dependsOn tasks.named('verifyShadowJarContents')
+
 processResources {
     def props = [version: version]
     inputs.properties props
