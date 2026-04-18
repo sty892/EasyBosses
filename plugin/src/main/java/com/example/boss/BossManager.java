@@ -90,8 +90,7 @@ public class BossManager {
             }
 
             boss.animationTick += 2;
-            int animLengthTicks = boss.definition.getAnimLength(boss.currentAnimation) * 20;
-            if (animLengthTicks <= 0) animLengthTicks = 20; // fallback
+            int animLengthTicks = boss.definition.getAnimLength(boss.currentAnimation);
             
             if (boss.animationTick >= animLengthTicks) {
                 boss.animationTick = 0; // loop

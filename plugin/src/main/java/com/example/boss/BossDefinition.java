@@ -37,8 +37,8 @@ public class BossDefinition {
     public int getAnimLength(String animName) {
         com.example.hitbox.HitboxTrack track = hitboxTracks.get(animName);
         if (track != null) {
-            return track.lengthTicks / 20; // returns seconds conceptually? wait, lengthTicks is in ticks. The plan says: "int animLength = definition.getAnimLength(currentAnimation) * 20" - wait, if it multiplies by 20, then getAnimLength must return seconds!
+            return track.lengthTicks;
         }
-        return 1;
+        return 20; // default 1 second in ticks
     }
 }
