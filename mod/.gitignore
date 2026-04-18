@@ -2,3 +2,4 @@
 build/
 *.jar
 .fabric/
+!gradle/wrapper/gradle-wrapper.jar

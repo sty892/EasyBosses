@@ -2,8 +2,11 @@ package com.example.resource;
 
 import net.minecraft.resource.InputSupplier;
 import net.minecraft.resource.ResourcePack;
+import net.minecraft.resource.ResourcePackInfo;
+import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.resource.metadata.ResourceMetadataReader;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,15 +15,18 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 public class FileSystemResourcePack implements ResourcePack {
     private final String id;
     private final Path root;
+    private final ResourcePackInfo info;
 
     public FileSystemResourcePack(String id, Path root) {
         this.id = id;
         this.root = root;
+        this.info = new ResourcePackInfo(id, Text.literal(id), ResourcePackSource.BUILTIN, Optional.empty());
     }
 
     @Override
@@ -55,7 +61,7 @@ public class FileSystemResourcePack implements ResourcePack {
     }
 
     @Override
-    public void listResources(ResourceType type, String namespace, String prefix, ResourceConsumer consumer) {
+    public void findResources(ResourceType type, String namespace, String prefix, ResourcePack.ResultConsumer consumer) {
         if (type != ResourceType.CLIENT_RESOURCES) return;
         try {
             if (!Files.exists(root)) return;
@@ -83,6 +89,11 @@ public class FileSystemResourcePack implements ResourcePack {
     @Override
     public Set<String> getNamespaces(ResourceType type) {
         return type == ResourceType.CLIENT_RESOURCES ? Collections.singleton("bossframework") : Collections.emptySet();
+    }
+
+    @Override
+    public ResourcePackInfo getInfo() {
+        return info;
     }
 
     @Override

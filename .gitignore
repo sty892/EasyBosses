@@ -5,3 +5,5 @@ gradle-8.10.2/
 *.jar
 !mod/src/main/resources/*.jar
 !plugin/src/main/resources/*.jar
+!mod/gradle/wrapper/gradle-wrapper.jar
+!plugin/gradle/wrapper/gradle-wrapper.jar
