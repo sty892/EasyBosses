@@ -1,0 +1,7 @@
+.gradle/
+**/build/
+gradle-dist/
+gradle-8.10.2/
+*.jar
+!mod/src/main/resources/*.jar
+!plugin/src/main/resources/*.jar
