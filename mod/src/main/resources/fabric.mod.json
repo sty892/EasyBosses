@@ -17,5 +17,8 @@
     "fabricloader": ">=0.15.0",
     "fabric-api": "*",
     "minecraft": "~1.21.1"
-  }
+  },
+  "mixins": [
+    "bossframework.mixins.json"
+  ]
 }
