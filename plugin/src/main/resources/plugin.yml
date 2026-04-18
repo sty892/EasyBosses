@@ -1,0 +1,4 @@
+name: BossFramework
+version: '${version}'
+main: com.example.BossFrameworkPlugin
+api-version: '1.21'
