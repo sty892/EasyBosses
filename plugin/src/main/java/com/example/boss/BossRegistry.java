@@ -22,7 +22,8 @@ public class BossRegistry {
 
     public void loadAll() {
         registry.clear();
-        File bossesDir = new File(plugin.getDataFolder(), "bosses");
+        String folderName = plugin.getConfig().getString("bosses-folder", "bosses");
+        File bossesDir = new File(plugin.getDataFolder(), folderName);
         if (!bossesDir.exists()) {
             bossesDir.mkdirs();
             return;

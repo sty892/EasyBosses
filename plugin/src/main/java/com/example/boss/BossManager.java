@@ -34,7 +34,8 @@ public class BossManager {
     }
 
     public void start() {
-        tickTask = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 0L, 2L);
+        long interval = plugin.getConfig().getLong("performance.tick-interval", 2L);
+        tickTask = Bukkit.getScheduler().runTaskTimer(plugin, this::tick, 0L, interval);
     }
 
     public void stop() {
@@ -61,7 +62,6 @@ public class BossManager {
         Interaction interaction = loc.getWorld().spawn(loc, Interaction.class, ent -> {
             ent.setInteractionWidth((float) def.bbWidth);
             ent.setInteractionHeight((float) def.bbHeight);
-            // Optionally link to armorstand via NBT or PDC so it persists, but we can recreate it
         });
 
         BossInstance inst = new BossInstance(def, stand, interaction);
@@ -78,6 +78,9 @@ public class BossManager {
     }
 
     public void tick() {
+        long tickInterval = plugin.getConfig().getLong("performance.tick-interval", 2L);
+        long hitboxInterval = plugin.getConfig().getLong("performance.hitbox-update-interval", 2L);
+
         for (var iterator = activeInstances.values().iterator(); iterator.hasNext();) {
             BossInstance boss = iterator.next();
 
@@ -89,20 +92,20 @@ public class BossManager {
                 continue;
             }
 
-            boss.animationTick += 2;
+            boss.animationTick += (int) tickInterval;
             int animLengthTicks = boss.definition.getAnimLength(boss.currentAnimation);
             
             if (boss.animationTick >= animLengthTicks) {
                 boss.animationTick = 0; // loop
             }
 
-            // Sync interaction pos
-            boss.cachedInteraction.teleport(boss.cachedStand);
+            // Sync interaction pos based on interval
+            if (Bukkit.getCurrentTick() % hitboxInterval < tickInterval) {
+                boss.cachedInteraction.teleport(boss.cachedStand);
+            }
 
             // Cooldowns
-            boss.attackCooldowns.replaceAll((k, v) -> v > 0 ? v - 2 : 0);
-
-            // Simple AI logic can go here...
+            boss.attackCooldowns.replaceAll((k, v) -> v > 0 ? v - (int) tickInterval : 0);
         }
     }
 
