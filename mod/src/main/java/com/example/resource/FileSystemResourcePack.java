@@ -5,7 +5,8 @@ import net.minecraft.resource.ResourcePack;
 import net.minecraft.resource.ResourcePackInfo;
 import net.minecraft.resource.ResourcePackSource;
 import net.minecraft.resource.ResourceType;
-import net.minecraft.resource.metadata.ResourceMetadataReader;
+import net.minecraft.resource.metadata.ResourceMetadata;
+import net.minecraft.resource.metadata.ResourceMetadataSerializer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
@@ -97,19 +98,12 @@ public class FileSystemResourcePack implements ResourcePack {
     }
 
     @Override
-    public <T> @Nullable T parseMetadata(ResourceMetadataReader<T> metaReader) throws IOException {
+    public <T> @Nullable T parseMetadata(ResourceMetadataSerializer<T> metadataSerializer) throws IOException {
         Path packMeta = root.resolve("pack.mcmeta");
         if (Files.exists(packMeta)) {
             try (InputStream is = Files.newInputStream(packMeta)) {
-                return metaReader.fromJson(new com.google.gson.JsonParser().parse(new java.io.InputStreamReader(is)).getAsJsonObject().getAsJsonObject("pack"));
+                return ResourceMetadata.create(is).decode(metadataSerializer).orElse(null);
             }
-        }
-        // Fallback for metadata if pack.mcmeta doesn't exist at root
-        if (metaReader.getKey().equals("pack")) {
-            com.google.gson.JsonObject obj = new com.google.gson.JsonObject();
-            obj.addProperty("description", "Boss Framework Resources");
-            obj.addProperty("pack_format", 15);
-            return metaReader.fromJson(obj);
         }
         return null;
     }
