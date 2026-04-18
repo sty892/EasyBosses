@@ -23,5 +23,15 @@ public class BossFrameworkClient implements ClientModInitializer {
         EntityRendererRegistry.register(EntityType.ARMOR_STAND, BossReplacedRenderer::new);
 
         ClientPacketHandler.register();
+
+        // Register cache as a builtin resource pack
+        FabricLoader.getInstance().getModContainer("bossframework").ifPresent(container -> {
+            ResourceManagerHelper.registerBuiltinResourcePack(
+                    Identifier.of("bossframework", "cache"),
+                    container,
+                    Text.literal("Boss Framework Cache"),
+                    ResourcePackActivationType.ALWAYS_ENABLED
+            );
+        });
     }
 }
