@@ -46,7 +46,7 @@ public class BossResourceLoader {
 
                 if (bossIds == null) return;
 
-                Path cacheDir = MinecraftClient.getInstance().runDirectory.toPath().resolve("bossframework_cache").resolve(host);
+                Path cacheDir = MinecraftClient.getInstance().runDirectory.toPath().resolve("bossframework_cache").resolve(host + "_" + port);
                 if (!Files.exists(cacheDir)) {
                     Files.createDirectories(cacheDir);
                 }
