@@ -84,6 +84,10 @@ public class ResourceServer {
         }
     }
 
+    public boolean isRunning() {
+        return app != null && app.jettyServer() != null && app.jettyServer().started();
+    }
+
     private byte[] getBossPackZip(BossDefinition definition) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

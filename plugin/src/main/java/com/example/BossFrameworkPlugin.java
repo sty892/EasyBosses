@@ -111,14 +111,14 @@ public class BossFrameworkPlugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        if (getConfig().getBoolean("resource-server.enabled", true)) {
+        if (resourceServer.isRunning()) {
             Bukkit.getScheduler().runTaskLater(this, () -> {
                 packetSender.sendHello(player, resourcePort);
                 // Sync existing bosses after hello
                 manager.syncToPlayer(player);
             }, 20L); // wait 1s
         } else {
-            // Even if resource server is disabled, we should sync bosses
+            // Even if resource server is disabled or failed, we should sync bosses
             manager.syncToPlayer(player);
         }
     }
