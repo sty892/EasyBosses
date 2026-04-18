@@ -116,7 +116,16 @@ public class BossManager {
         packetSender.sendAnimState(nearby, boss.armorStandEntityId, newAnim, 0);
     }
 
-    private Collection<Player> getNearbyPlayers(Location loc, double radius) {
+    public void removeBoss(BossInstance boss) {
+        activeInstances.remove(boss.armorStandUUID);
+        Collection<Player> nearby = getNearbyPlayers(boss.cachedStand.getLocation(), 64);
+        packetSender.sendDespawn(nearby, boss.armorStandEntityId);
+        
+        if (boss.cachedStand != null) boss.cachedStand.remove();
+        if (boss.cachedInteraction != null) boss.cachedInteraction.remove();
+    }
+
+    public Collection<Player> getNearbyPlayers(Location loc, double radius) {
         if (loc == null || loc.getWorld() == null) return java.util.Collections.emptyList();
         return loc.getWorld().getNearbyEntities(loc, radius, radius, radius).stream()
                 .filter(e -> e instanceof Player)

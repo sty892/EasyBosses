@@ -51,10 +51,7 @@ public class DamageListener implements Listener {
 
             if (boss.currentHealth <= 0) {
                 player.sendMessage("§cBoss defeated!");
-                bossManager.activeInstances.remove(boss.armorStandUUID);
-                boss.cachedStand.remove();
-                boss.cachedInteraction.remove();
-                // Should also send despawn packet
+                bossManager.removeBoss(boss);
             }
         }
     }
