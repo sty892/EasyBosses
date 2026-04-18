@@ -58,6 +58,10 @@ public class BossResourceLoader {
                     System.out.println("Boss resources loaded for " + bossId);
                 }
 
+                MinecraftClient.getInstance().execute(() -> {
+                    MinecraftClient.getInstance().reloadResources();
+                });
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
