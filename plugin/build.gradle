@@ -64,8 +64,6 @@ shadowJar {
     configurations = [project.configurations.runtimeClasspath]
     mergeServiceFiles()
 
-    relocate 'io.github.retrooper.packetevents', 'com.example.shadow.packetevents'
-    relocate 'com.github.retrooper.packetevents', 'com.example.shadow.packetevents2'
     relocate('io.javalin', 'com.example.shadow.javalin')
     relocate('org.eclipse.jetty', 'com.example.shadow.jetty')
     relocate('org.slf4j', 'com.example.shadow.slf4j')
