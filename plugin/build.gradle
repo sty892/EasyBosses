@@ -1,10 +1,14 @@
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'com.gradleup.shadow' version '9.2.0'
 }
 
 group = 'com.example'
 version = '0.5.3'
+
+base {
+    archivesName = 'BossFrameworkPlugin'
+}
 
 repositories {
     mavenCentral()
@@ -39,6 +43,29 @@ java {
 
 tasks.withType(JavaCompile).configureEach {
     options.release = 21
+}
+
+tasks.named('jar') {
+    archiveClassifier = 'plain'
+}
+
+tasks.named('shadowJar') {
+    archiveClassifier = ''
+    configurations = [project.configurations.runtimeClasspath]
+    mergeServiceFiles()
+
+    relocate('io.github.retrooper.packetevents', 'com.example.shadow.packetevents')
+    relocate('io.javalin', 'com.example.shadow.javalin')
+    relocate('org.eclipse.jetty', 'com.example.shadow.jetty')
+    relocate('org.slf4j', 'com.example.shadow.slf4j')
+}
+
+tasks.named('assemble') {
+    dependsOn(tasks.named('shadowJar'))
+}
+
+artifacts {
+    archives tasks.named('shadowJar')
 }
 
 processResources {
